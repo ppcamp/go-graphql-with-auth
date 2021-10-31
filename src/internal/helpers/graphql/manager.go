@@ -32,12 +32,14 @@ func (s *Schema) Get() graphql.Schema {
 	// Schema
 	schema, err := graphql.NewSchema(graphql.SchemaConfig{
 		Query: graphql.NewObject(graphql.ObjectConfig{
-			Name:   "Query",
-			Fields: s.queries,
+			Name:        "Query",
+			Description: "All elements that can be fetched",
+			Fields:      s.queries,
 		}),
 		Mutation: graphql.NewObject(graphql.ObjectConfig{
-			Name:   "Mutation",
-			Fields: s.mutations,
+			Name:        "Mutation",
+			Description: "All functions that make some change in API",
+			Fields:      s.mutations,
 		}),
 	})
 
