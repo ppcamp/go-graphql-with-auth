@@ -4,5 +4,9 @@
 			"path": "./src"
 		}
 	],
-	"settings": {}
+	"settings": {},
+	"tasks": {
+		"version": "2.0.0",
+		"tasks": []
+	}
 }

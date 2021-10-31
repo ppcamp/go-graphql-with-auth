@@ -17,14 +17,22 @@ func (t *UserControllerBuilder) QueryHello() *graphql.Field {
 func (t *UserControllerBuilder) CreateUser() *graphql.Field {
 	return &graphql.Field{
 		Type:        userType,
-		Description: "Update the user",
+		Description: "Create a new user",
 
 		Args: graphql.FieldConfigArgument{
-			"name": &graphql.ArgumentConfig{
+			"nick": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.String),
+			},
+			"password": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.String),
+			},
+			"email": &graphql.ArgumentConfig{
 				Type: graphql.NewNonNull(graphql.String),
 			},
 		},
 
-		Resolve: t.createUserMutation,
+		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+			return t.handler.Transaction(p, t.createUserMutation)
+		},
 	}
 }

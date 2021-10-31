@@ -1,16 +1,8 @@
 package user
 
 import (
-	"time"
-
 	"github.com/graphql-go/graphql"
 )
-
-type User struct {
-	Id       int64     `json:"id,omitempty"`
-	Name     string    `json:"name,omitempty"`
-	Birthday time.Time `json:"birthday,omitempty"`
-}
 
 var userType = graphql.NewObject(
 	graphql.ObjectConfig{
@@ -20,13 +12,17 @@ var userType = graphql.NewObject(
 				Type:        graphql.Int,
 				Description: "User's id",
 			},
-			"name": &graphql.Field{
+			"nick": &graphql.Field{
 				Type:        graphql.String,
-				Description: "User's name",
+				Description: "User's nickname",
 			},
-			"birthday": &graphql.Field{
-				Type:        graphql.DateTime,
-				Description: "User's birthday",
+			"email": &graphql.Field{
+				Type:        graphql.String,
+				Description: "User's email",
+			},
+			"updated_at": &graphql.Field{
+				Type:        graphql.String,
+				Description: "When the field was updated",
 			},
 		},
 	},

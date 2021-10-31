@@ -58,3 +58,5 @@ require (
 	golang.org/x/tools v0.0.0-20210106214847-113979e3529a // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 )
+
+require github.com/golang-migrate/migrate v3.5.4+incompatible // indirect
