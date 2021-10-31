@@ -1,0 +1,12 @@
+version: "3.7"
+services:
+  postgres:
+    image: 'postgres:13'
+    container_name: postgres-database
+    environment:
+      - POSTGRES_PASSWORD=gopsswd
+      - POSTGRES_USER=gouser
+      - POSTGRES_DB=gousers
+    ports:
+      - '5432:5432'
+    restart: always
