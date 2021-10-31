@@ -4,7 +4,7 @@ import (
 	"os"
 
 	"github.com/ppcamp/go-graphql-with-auth/internal/config"
-	"github.com/ppcamp/go-graphql-with-auth/internal/repository/postgres"
+	postgres "github.com/ppcamp/go-graphql-with-auth/internal/repository"
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 )
@@ -31,7 +31,7 @@ func run(c *cli.Context) error {
 
 	storage, err := postgres.NewStorage()
 	if err != nil {
-		logrus.Fatal("couldn't connect to database/postgresql")
+		logrus.Fatal("couldn't connect to databaseql")
 	}
 
 	r := SetupEngine(storage)

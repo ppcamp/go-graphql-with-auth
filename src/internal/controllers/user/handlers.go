@@ -4,14 +4,12 @@ import (
 	"github.com/graphql-go/graphql"
 )
 
-var Phrase = "world"
-
 // [QUERY] user
-func (t *UserControllerBuilder) GetHello() *graphql.Field {
+func (t *UserControllerBuilder) QueryHello() *graphql.Field {
 	return &graphql.Field{
-		Type:        graphql.String,
+		Type:        userType,
 		Description: "Get the user phrase",
-		Resolve:     t.getHello,
+		Resolve:     t.queryUser,
 	}
 }
 
@@ -19,14 +17,11 @@ func (t *UserControllerBuilder) GetHello() *graphql.Field {
 func (t *UserControllerBuilder) CreateUser() *graphql.Field {
 	return &graphql.Field{
 		Type:        userType,
-		Description: "Create new user",
+		Description: "Update the user",
 
 		Args: graphql.FieldConfigArgument{
 			"name": &graphql.ArgumentConfig{
 				Type: graphql.NewNonNull(graphql.String),
-			},
-			"birthday": &graphql.ArgumentConfig{
-				Type: graphql.NewNonNull(graphql.DateTime),
 			},
 		},
 

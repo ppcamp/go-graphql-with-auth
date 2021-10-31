@@ -25,6 +25,8 @@ func newStore() (str *store, err error) {
 	if err != nil {
 		return nil, err
 	}
+	db.SetConnMaxIdleTime(cfg.Database.ConnIdleMaxTime)
+
 	str = &store{db}
 	str.SetMaxIdleConns(cfg.Database.MinConnections)
 	str.SetMaxOpenConns(cfg.Database.MaxConnections)

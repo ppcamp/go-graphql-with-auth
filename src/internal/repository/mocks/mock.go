@@ -3,7 +3,7 @@ package mocks
 import (
 	"database/sql"
 
-	"github.com/ppcamp/go-graphql-with-auth/internal/repository/postgres"
+	postgres "github.com/ppcamp/go-graphql-with-auth/internal/repository"
 	"github.com/stretchr/testify/mock"
 )
 

@@ -3,13 +3,36 @@ package main
 import (
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
+	"github.com/ppcamp/go-graphql-with-auth/internal/controllers/app"
 	"github.com/ppcamp/go-graphql-with-auth/internal/controllers/user"
-	"github.com/ppcamp/go-graphql-with-auth/internal/graphql"
-	"github.com/ppcamp/go-graphql-with-auth/internal/repository/postgres"
+	"github.com/ppcamp/go-graphql-with-auth/internal/helpers/graphql"
+	postgres "github.com/ppcamp/go-graphql-with-auth/internal/repository"
 )
 
 func SetupEngine(storage postgres.Storage) *gin.Engine {
 	router := gin.New()
+
+	registerMiddlewares(router)
+
+	// handlers
+	schemaManager := graphql.NewSchemaManager()
+	userController := user.NewUserControllerBuilder(storage)
+	appController := app.NewAppController(storage)
+
+	// Endpoints
+	schemaManager.RegisterQuery("app", appController.QueryAppStatus())
+	schemaManager.RegisterQuery("user", userController.QueryHello())
+	schemaManager.RegisterMutation("updateUser", userController.CreateUser())
+
+	gql := router.Group("/graphql")
+	{
+		gql.POST("", schemaManager.Handler())
+		gql.GET("", schemaManager.Handler())
+	}
+	return router
+}
+
+func registerMiddlewares(router *gin.Engine) {
 	middleware := NewMiddleware()
 
 	// router.Use(gin.LoggerWithWriter(gin.DefaultWriter, "/appstatus"))
@@ -27,18 +50,4 @@ func SetupEngine(storage postgres.Storage) *gin.Engine {
 	router.NoRoute(middleware.NotFound)
 	router.NoMethod(middleware.MethodNotAllowed)
 
-	// handlers
-	schemaManager := graphql.NewSchemaManager()
-	userController := user.NewUserControllerBuilder(storage)
-
-	// Endpoints
-	schemaManager.RegisterQuery("hello", userController.GetHello())
-	schemaManager.RegisterMutation("hello", userController.CreateUser())
-
-	gql := router.Group("/graphql")
-	{
-		gql.POST("", schemaManager.Handler())
-		gql.GET("", schemaManager.Handler())
-	}
-	return router
 }

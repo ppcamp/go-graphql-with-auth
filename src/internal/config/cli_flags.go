@@ -1,6 +1,8 @@
 package config
 
 import (
+	"time"
+
 	"github.com/urfave/cli/v2"
 )
 
@@ -74,6 +76,12 @@ var Flags = []cli.Flag{
 		Destination: &Database.MinConnections,
 		EnvVars:     []string{"RDBMS_MIN_CONNECTIONS"},
 		Value:       1,
+	},
+	&cli.DurationFlag{
+		Name:        "rdbms_max_idle_duration",
+		Destination: &Database.ConnIdleMaxTime,
+		EnvVars:     []string{"RDBMS_MAX_IDLE_DURATION"},
+		Value:       time.Second * 2,
 	},
 	//#endregion
 }

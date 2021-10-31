@@ -2,8 +2,8 @@ package postgres
 
 import (
 	"github.com/jmoiron/sqlx"
-	"github.com/ppcamp/go-graphql-with-auth/internal/repository/postgres/status"
-	"github.com/ppcamp/go-graphql-with-auth/internal/repository/postgres/user"
+	"github.com/ppcamp/go-graphql-with-auth/internal/repository/status"
+	"github.com/ppcamp/go-graphql-with-auth/internal/repository/user"
 )
 
 // Holds all objects that connects into postgresql
