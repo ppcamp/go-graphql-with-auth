@@ -3,11 +3,10 @@ package app
 import (
 	"time"
 
-	"github.com/graphql-go/graphql"
 	postgres "github.com/ppcamp/go-graphql-with-auth/internal/repository"
 )
 
-func (t *AppController) queryPing(tr postgres.Transaction, p graphql.ResolveParams) (interface{}, error) {
+func (t *AppController) queryPing(tr postgres.Transaction, _ interface{}) (interface{}, error) {
 	status := AppStatus{Postgresql: false}
 	start := time.Now()
 	err := tr.Ping()

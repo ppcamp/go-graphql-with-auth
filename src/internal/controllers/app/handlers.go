@@ -10,7 +10,7 @@ func (t *AppController) QueryAppStatus() *graphql.Field {
 		Type:        appStatusType,
 		Description: "Get the app status",
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-			return t.handler.Transaction(p, t.queryPing)
+			return t.handler.Transaction(p, nil, t.queryPing)
 		},
 	}
 }

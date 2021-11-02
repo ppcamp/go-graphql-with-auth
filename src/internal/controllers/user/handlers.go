@@ -2,6 +2,7 @@ package user
 
 import (
 	"github.com/graphql-go/graphql"
+	"github.com/ppcamp/go-graphql-with-auth/internal/models"
 )
 
 // [QUERY] user
@@ -32,7 +33,7 @@ func (t *UserControllerBuilder) CreateUser() *graphql.Field {
 		},
 
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-			return t.handler.Transaction(p, t.createUserMutation)
+			return t.handler.Transaction(p, &models.User{}, t.createUserMutation)
 		},
 	}
 }
