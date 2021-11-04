@@ -26,3 +26,7 @@ migrate -database $POSTGRES_URL -path src/internal/repository/migrations/ up
 # Fallback
 migrate -database $POSTGRES_URL -path src/internal/repository/migrations/ up
 ```
+
+## Packages
+
+- [sqlx](https://jmoiron.github.io/sqlx/)

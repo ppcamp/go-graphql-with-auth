@@ -11,7 +11,5 @@ func ShouldBind(dict map[string]interface{}, obj interface{}) error {
 		logrus.WithError(err).Fatal("It shouldn't throw an error")
 	}
 
-	logrus.WithField("pl", obj).Debug("Object parsed")
-
 	return Validator.Struct(obj)
 }

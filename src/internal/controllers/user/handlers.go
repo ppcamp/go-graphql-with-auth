@@ -8,7 +8,7 @@ import (
 // [QUERY] user
 func (t *UserControllerBuilder) QueryUsers() *graphql.Field {
 	return &graphql.Field{
-		Type:        userType,
+		Type:        graphql.NewList(userType),
 		Description: "Get all users",
 
 		Args: graphql.FieldConfigArgument{
@@ -19,6 +19,12 @@ func (t *UserControllerBuilder) QueryUsers() *graphql.Field {
 				Type: graphql.String,
 			},
 			"id": &graphql.ArgumentConfig{
+				Type: graphql.Int,
+			},
+			"skip": &graphql.ArgumentConfig{
+				Type: graphql.Int,
+			},
+			"take": &graphql.ArgumentConfig{
 				Type: graphql.Int,
 			},
 		},

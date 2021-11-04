@@ -19,6 +19,5 @@ type UserQueryPayload struct {
 	Nick      *string    `json:"nick,omitempty" db:"nick" binding:"omitempty"`
 	Email     *string    `json:"email,omitempty" db:"email" binding:"omitempty"`
 	UpdatedAt *time.Time `json:"updated_at,omitempty" db:"updated_at" binding:"omitempty"`
-
-	*models.QueryPayload
+	models.QueryPayload
 }

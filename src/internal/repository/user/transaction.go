@@ -11,6 +11,7 @@ type UserTransaction struct {
 
 type UserStorage interface {
 	CreateUser(payload *usermodels.UserMutationPayload) (user usermodels.UserEntity, err error)
+	FindUsers(filter *usermodels.UserQueryPayload) (users []usermodels.UserEntity, err error)
 }
 
 func NewTransaction(tx *sqlx.Tx) *UserTransaction {
