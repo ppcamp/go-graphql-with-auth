@@ -1,9 +1,18 @@
 package user
 
 import (
-	"github.com/graphql-go/graphql"
+	"github.com/ppcamp/go-graphql-with-auth/internal/helpers/controller"
 )
 
-func (t *UserControllerBuilder) queryUser(p graphql.ResolveParams) (interface{}, error) {
-	return nil, nil
+type QueryUserController struct {
+	controller.BaseControllerImpl
+}
+
+func (c *QueryUserController) Execute(pl interface{}) (result controller.ResponseController) {
+	result = controller.NewResponseController()
+	return
+}
+
+func NewQueryUserController() controller.BaseController {
+	return &QueryUserController{}
 }

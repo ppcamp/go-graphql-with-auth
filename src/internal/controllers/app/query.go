@@ -3,22 +3,35 @@ package app
 import (
 	"time"
 
-	postgres "github.com/ppcamp/go-graphql-with-auth/internal/repository"
+	"github.com/ppcamp/go-graphql-with-auth/internal/helpers/controller"
+	"github.com/sirupsen/logrus"
 )
 
-func (t *AppController) queryPing(tr postgres.Transaction, _ interface{}) (interface{}, error) {
+type QueryPingController struct {
+	controller.TransactionControllerImpl
+}
+
+func (c *QueryPingController) Execute(pl interface{}) (result controller.ResponseController) {
+	result = controller.NewResponseController()
+
 	status := AppStatus{Postgresql: false}
 	start := time.Now()
-	err := tr.Ping()
+
+	err := c.Transaction.Ping()
 	status.ConnectionDelay = time.Since(start).Microseconds()
-
 	if err != nil {
-		t.log.WithError(err).Warn("failed to connect with database")
-		return nil, err
+		logrus.WithError(err).Warn("failed to connect with database")
+		result.SetError(err)
+		return
 	}
+
 	status.Postgresql = true
+	logrus.WithField("status", status).Info("query app and it's working")
 
-	t.log.WithField("status", status).Info("query app and it's working")
+	result.SetResponse(status)
+	return
+}
 
-	return status, nil
+func NewQueryPingController() controller.TransactionController {
+	return &QueryPingController{}
 }

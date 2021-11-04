@@ -10,7 +10,9 @@ func (t *UserControllerBuilder) QueryHello() *graphql.Field {
 	return &graphql.Field{
 		Type:        userType,
 		Description: "Get the user phrase",
-		Resolve:     t.queryUser,
+		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+			return t.handler.Request(p, nil, NewQueryUserController())
+		},
 	}
 }
 
@@ -33,7 +35,7 @@ func (t *UserControllerBuilder) CreateUser() *graphql.Field {
 		},
 
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-			return t.handler.Transaction(p, &models.User{}, t.createUserMutation)
+			return t.handler.Request(p, &models.User{}, NewCreateUserController())
 		},
 	}
 }

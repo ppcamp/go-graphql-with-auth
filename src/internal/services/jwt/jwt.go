@@ -1,6 +1,7 @@
 package jwt
 
 import (
+	"context"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -36,17 +37,21 @@ type jwtClaims struct {
 
 // GetSession get the current session of the gin.
 // If there's no session in the req, returns false
-func GetSession(c *gin.Context) (Session, bool) {
-	session, ok := c.Get(GIN_JWT_SESSION_KEY)
+func GetSession(c context.Context) (Session, bool) {
+	if c, ok := c.(*gin.Context); ok {
+		session, ok := c.Get(GIN_JWT_SESSION_KEY)
 
-	if !ok {
-		return Session{}, false
+		if !ok {
+			return Session{}, false
+		}
+
+		ses := session.(Session)
+		ses.Authenticated = true
+
+		return ses, true
 	}
 
-	ses := session.(Session)
-	ses.Authenticated = true
-
-	return ses, true
+	return Session{}, false
 }
 
 // generateJwt generates a token to the current session for a given amount
