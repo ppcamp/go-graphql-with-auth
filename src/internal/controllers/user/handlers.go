@@ -6,12 +6,25 @@ import (
 )
 
 // [QUERY] user
-func (t *UserControllerBuilder) QueryHello() *graphql.Field {
+func (t *UserControllerBuilder) QueryUsers() *graphql.Field {
 	return &graphql.Field{
 		Type:        userType,
-		Description: "Get the user phrase",
+		Description: "Get all users",
+
+		Args: graphql.FieldConfigArgument{
+			"nick": &graphql.ArgumentConfig{
+				Type: graphql.String,
+			},
+			"email": &graphql.ArgumentConfig{
+				Type: graphql.String,
+			},
+			"id": &graphql.ArgumentConfig{
+				Type: graphql.Int,
+			},
+		},
+
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-			return t.handler.Request(p, nil, NewQueryUserController())
+			return t.handler.Request(p, &models.User{}, NewQueryUserController())
 		},
 	}
 }

@@ -21,7 +21,7 @@ func SetupEngine(storage postgres.Storage) *gin.Engine {
 
 	// Endpoints
 	schemaManager.RegisterQuery("app", appController.QueryAppStatus())
-	schemaManager.RegisterQuery("user", userController.QueryHello())
+	schemaManager.RegisterQuery("users", userController.QueryUsers())
 	schemaManager.RegisterMutation("createUser", userController.CreateUser())
 
 	router.Any("/graphql", schemaManager.Handler())
