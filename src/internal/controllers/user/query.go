@@ -2,7 +2,7 @@ package user
 
 import (
 	"github.com/ppcamp/go-graphql-with-auth/internal/helpers/controller"
-	"github.com/ppcamp/go-graphql-with-auth/internal/models"
+	"github.com/ppcamp/go-graphql-with-auth/internal/models/usermodels"
 	"github.com/sirupsen/logrus"
 )
 
@@ -12,8 +12,8 @@ type QueryUserController struct {
 
 func (c *QueryUserController) Execute(pl interface{}) (result controller.ResponseController) {
 	result = controller.NewResponseController()
-	user := pl.(*models.User)
-	logrus.WithField("pl", user).Debug("user")
+	filter := pl.(*usermodels.UserQueryPayload)
+	logrus.WithField("pl", filter).Debug("user")
 	return
 }
 

@@ -2,7 +2,7 @@ package user
 
 import (
 	"github.com/ppcamp/go-graphql-with-auth/internal/helpers/controller"
-	"github.com/ppcamp/go-graphql-with-auth/internal/models"
+	"github.com/ppcamp/go-graphql-with-auth/internal/models/usermodels"
 )
 
 type CreateUserController struct {
@@ -10,7 +10,7 @@ type CreateUserController struct {
 }
 
 func (c *CreateUserController) Execute(pl interface{}) (result controller.ResponseController) {
-	user := pl.(*models.User)
+	user := pl.(*usermodels.UserMutationPayload)
 	result = controller.NewResponseController()
 
 	response, err := c.Transaction.CreateUser(user)

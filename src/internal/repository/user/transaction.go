@@ -2,7 +2,7 @@ package user
 
 import (
 	"github.com/jmoiron/sqlx"
-	"github.com/ppcamp/go-graphql-with-auth/internal/models"
+	"github.com/ppcamp/go-graphql-with-auth/internal/models/usermodels"
 )
 
 type UserTransaction struct {
@@ -10,7 +10,7 @@ type UserTransaction struct {
 }
 
 type UserStorage interface {
-	CreateUser(payload *models.User) (user models.User, err error)
+	CreateUser(payload *usermodels.UserMutationPayload) (user usermodels.UserEntity, err error)
 }
 
 func NewTransaction(tx *sqlx.Tx) *UserTransaction {

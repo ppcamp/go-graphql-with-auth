@@ -2,7 +2,7 @@ package user
 
 import (
 	"github.com/graphql-go/graphql"
-	"github.com/ppcamp/go-graphql-with-auth/internal/models"
+	"github.com/ppcamp/go-graphql-with-auth/internal/models/usermodels"
 )
 
 // [QUERY] user
@@ -24,7 +24,7 @@ func (t *UserControllerBuilder) QueryUsers() *graphql.Field {
 		},
 
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-			return t.handler.Request(p, &models.User{}, NewQueryUserController())
+			return t.handler.Request(p, &usermodels.UserQueryPayload{}, NewQueryUserController())
 		},
 	}
 }
@@ -48,7 +48,7 @@ func (t *UserControllerBuilder) CreateUser() *graphql.Field {
 		},
 
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-			return t.handler.Request(p, &models.User{}, NewCreateUserController())
+			return t.handler.Request(p, &usermodels.UserMutationPayload{}, NewCreateUserController())
 		},
 	}
 }

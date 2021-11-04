@@ -1,11 +1,11 @@
 package user
 
 import (
-	"github.com/ppcamp/go-graphql-with-auth/internal/models"
+	"github.com/ppcamp/go-graphql-with-auth/internal/models/usermodels"
 )
 
-func (t *UserTransaction) CreateUser(payload *models.User) (user models.User, err error) {
-	user = models.User{}
+func (t *UserTransaction) CreateUser(payload *usermodels.UserMutationPayload) (user usermodels.UserEntity, err error) {
+	user = usermodels.UserEntity{}
 	user.Email = payload.Password
 	user.Nick = payload.Nick
 	user.Password = payload.Password
