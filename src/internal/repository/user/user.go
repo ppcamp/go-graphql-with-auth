@@ -1,6 +1,9 @@
 package user
 
 import (
+	"database/sql"
+	"errors"
+
 	"github.com/jmoiron/sqlx"
 	usermodels "github.com/ppcamp/go-graphql-with-auth/internal/models/user"
 	"github.com/ppcamp/go-graphql-with-auth/internal/utils"
@@ -65,5 +68,21 @@ func (t *UserTransaction) EditUser(payload *usermodels.UserMutationPayload) (use
 		err = rows.Scan(&user.UpdatedAt)
 	}
 
+	return
+}
+
+func (t *UserTransaction) FindUserWithPassword(filter *usermodels.UserMutationPayload) (user usermodels.UserEntity, err error) {
+	user = usermodels.UserEntity{}
+
+	query := `
+	SELECT id
+	FROM users
+	WHERE nick = $1
+		AND password = $2
+	`
+	err = t.tx.Get(&user, query, filter.Nick, filter.Password)
+	if err == sql.ErrNoRows {
+		err = errors.New("invalid nick-password combination")
+	}
 	return
 }

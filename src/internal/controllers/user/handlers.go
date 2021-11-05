@@ -86,3 +86,24 @@ func (t *UserControllerBuilder) EditUser() *graphql.Field {
 		},
 	}
 }
+
+// [MUTATION] login
+func (t *UserControllerBuilder) Login() *graphql.Field {
+	return &graphql.Field{
+		Type:        loginType,
+		Description: "Edit an user basing on its id",
+
+		Args: graphql.FieldConfigArgument{
+			"nick": &graphql.ArgumentConfig{
+				Type: graphql.String,
+			},
+			"password": &graphql.ArgumentConfig{
+				Type: graphql.String,
+			},
+		},
+
+		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+			return t.handler.Request(p, &usermodels.UserMutationPayload{}, NewLoginUserController())
+		},
+	}
+}

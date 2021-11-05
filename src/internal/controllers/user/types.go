@@ -27,3 +27,19 @@ var userType = graphql.NewObject(
 		},
 	},
 )
+
+var loginType = graphql.NewObject(
+	graphql.ObjectConfig{
+		Name: "Login",
+		Fields: graphql.Fields{
+			"token": &graphql.Field{
+				Type:        graphql.String,
+				Description: "The JWT token needed for use 'me'",
+			},
+			"expires": &graphql.Field{
+				Type:        graphql.String,
+				Description: "When the token will expire",
+			},
+		},
+	},
+)

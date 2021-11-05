@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	jwt "github.com/golang-jwt/jwt"
+	loginmodels "github.com/ppcamp/go-graphql-with-auth/internal/models/login"
 )
 
 // BlankSession is the default value returned when occurrs a problem to login
@@ -50,12 +51,6 @@ func generateJwtAsSignedString(session Session, expiration time.Time, key []byte
 	return signedString, err
 }
 
-// Token login response
-type tokenResponse struct {
-	Token   string `json:"token,omitempty"`   // Session token
-	Expires string `json:"expires,omitempty"` // Expiration timestamp
-}
-
 // buildAndResponseToken generates a signed endpoint with expiration
 func (md *JWTMiddleware) buildAndResponseToken(c *gin.Context, session Session, domain string) {
 	exp := time.Now().UTC().Add(md.Expires)
@@ -70,7 +65,7 @@ func (md *JWTMiddleware) buildAndResponseToken(c *gin.Context, session Session, 
 
 	c.SetCookie("session", signedString, int(md.Expires.Seconds()), "/", domain, false, false)
 
-	c.JSON(http.StatusOK, tokenResponse{
+	c.JSON(http.StatusOK, loginmodels.TokenResponse{
 		Token:   signedString,
 		Expires: exp.Format(time.RFC3339),
 	})

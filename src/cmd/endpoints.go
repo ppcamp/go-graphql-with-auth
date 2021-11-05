@@ -25,6 +25,7 @@ func SetupEngine(storage postgres.Storage) *gin.Engine {
 	// Endpoints unprotected
 	schema.RegisterQuery("users", userController.QueryUsers())
 	schema.RegisterMutation("createUser", userController.CreateUser())
+	schema.RegisterMutation("login", userController.Login())
 
 	// Endpoints protected
 	schema.RegisterAuthenticatedQuery("app", appController.QueryAppStatus())
