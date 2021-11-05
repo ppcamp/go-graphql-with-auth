@@ -18,18 +18,20 @@ func SetupEngine(storage postgres.Storage) *gin.Engine {
 	registerMiddlewares(router)
 
 	// handlers
-	schemaManager := graphql.NewSchemaManager()
+	schema := graphql.NewSchemaManager()
 	userController := user.NewUserControllerBuilder(storage)
 	appController := app.NewAppController(storage)
 
-	// Endpoints
-	schemaManager.RegisterAuthenticatedQuery("app", appController.QueryAppStatus())
-	schemaManager.RegisterQuery("users", userController.QueryUsers())
-	schemaManager.RegisterMutation("createUser", userController.CreateUser())
-	schemaManager.RegisterAuthenticatedMutation("updateUser", userController.EditUser())
+	// Endpoints unprotected
+	schema.RegisterQuery("users", userController.QueryUsers())
+	schema.RegisterMutation("createUser", userController.CreateUser())
+
+	// Endpoints protected
+	schema.RegisterAuthenticatedQuery("app", appController.QueryAppStatus())
+	schema.RegisterAuthenticatedMutation("updateUser", userController.EditUser())
 
 	// register
-	router.Any("/graphql", schemaManager.Handler())
+	router.Any("/graphql", schema.Handler())
 
 	return router
 }

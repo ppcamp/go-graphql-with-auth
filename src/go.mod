@@ -6,10 +6,8 @@ require github.com/graphql-go/graphql v0.8.0
 
 require (
 	github.com/gin-contrib/sse v0.1.0 // indirect
-	github.com/gin-gonic/gin v1.7.4 // indirect
 	github.com/go-playground/locales v0.13.0 // indirect
 	github.com/go-playground/universal-translator v0.17.0 // indirect
-	github.com/go-playground/validator/v10 v10.4.1 // indirect
 	github.com/golang/protobuf v1.3.3 // indirect
 	github.com/json-iterator/go v1.1.9 // indirect
 	github.com/leodido/go-urn v1.2.0 // indirect
@@ -39,24 +37,16 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/objx v0.1.0 // indirect
-	github.com/urfave/cli v1.22.5
 	gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c // indirect
 )
 
 require (
-	github.com/99designs/gqlgen v0.14.0 // indirect
-	github.com/agnivade/levenshtein v1.1.0 // indirect
-	github.com/gorilla/websocket v1.4.2 // indirect
+	github.com/gin-gonic/gin v1.7.4
+	github.com/go-playground/validator/v10 v10.4.1
 	github.com/graphql-go/handler v0.2.3
-	github.com/hashicorp/golang-lru v0.5.0 // indirect
-	github.com/matryer/moq v0.0.0-20200106131100-75d0ddfc0007 // indirect
-	github.com/mitchellh/mapstructure v0.0.0-20180203102830-a4e142e9c047 // indirect
-	github.com/pkg/errors v0.8.1 // indirect
-	github.com/vektah/dataloaden v0.2.1-0.20190515034641-a19b9a6e7c9e // indirect
-	github.com/vektah/gqlparser/v2 v2.2.0 // indirect
-	golang.org/x/mod v0.3.0 // indirect
-	golang.org/x/tools v0.0.0-20210106214847-113979e3529a // indirect
-	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 )
 
-require github.com/golang-migrate/migrate v3.5.4+incompatible // indirect
+require (
+	github.com/kr/pretty v0.1.0 // indirect
+	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
+)
