@@ -32,6 +32,12 @@ var Flags = []cli.Flag{
 		EnvVars:     []string{"APP_JWT_SECRET"},
 		Value:       "20994458adf248e6a2e2034235e3a0f4",
 	},
+	&cli.DurationFlag{
+		Name:        "app_jwt_exp",
+		Destination: &App.JWTExp,
+		EnvVars:     []string{"APP_JWT_EXP"},
+		Value:       1 * Year,
+	},
 	&cli.BoolFlag{
 		Name:        "app_migrate",
 		Destination: &App.Migrate,

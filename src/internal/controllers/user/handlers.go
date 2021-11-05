@@ -3,6 +3,7 @@ package user
 import (
 	"github.com/graphql-go/graphql"
 	usermodels "github.com/ppcamp/go-graphql-with-auth/internal/models/user"
+	"github.com/ppcamp/go-graphql-with-auth/internal/services/jwt"
 )
 
 // [QUERY] user
@@ -91,7 +92,7 @@ func (t *UserControllerBuilder) EditUser() *graphql.Field {
 func (t *UserControllerBuilder) Login() *graphql.Field {
 	return &graphql.Field{
 		Type:        loginType,
-		Description: "Edit an user basing on its id",
+		Description: "Does a login and generate an authenticated jwt",
 
 		Args: graphql.FieldConfigArgument{
 			"nick": &graphql.ArgumentConfig{
@@ -103,7 +104,16 @@ func (t *UserControllerBuilder) Login() *graphql.Field {
 		},
 
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-			return t.handler.Request(p, &usermodels.UserMutationPayload{}, NewLoginUserController())
+			_, err := t.handler.Request(p, &usermodels.UserMutationPayload{}, NewLoginUserController())
+			if err == nil {
+				s := jwt.Session{
+					LoginSession: &jwt.LoginSession{
+						UserId: 1,
+					},
+				}
+				return jwt.BuildToken(p.Context, s)
+			}
+			return nil, err
 		},
 	}
 }

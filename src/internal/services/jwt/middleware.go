@@ -84,19 +84,19 @@ func (md *JWTMiddleware) getJWTClaims(tokenString string) (*jwtClaims, error) {
 //
 // See [getTokenFromHeader], [getTokenFromCookie], [getJWTClaims]
 func (md *JWTMiddleware) findSession(c *gin.Context) (Session, error) {
-	tokeString, err := md.getTokenFromHeader(c)
+	tokenString, err := md.getTokenFromHeader(c)
 
 	if err != nil {
-		tokeString, err = md.getTokenFromCookie(c)
+		tokenString, err = md.getTokenFromCookie(c)
 
 		if err != nil {
 			return BLANK_SESSION, err
 		}
 	}
 
-	claims, err := md.getJWTClaims(tokeString)
-
+	claims, err := md.getJWTClaims(tokenString)
 	if err != nil {
+		// logrus.WithField("claims", claims).WithError(err).Debug("findSession")
 		return BLANK_SESSION, err
 	}
 
@@ -109,9 +109,7 @@ func (md *JWTMiddleware) findSession(c *gin.Context) (Session, error) {
 //
 // This function will register the header auth into context
 func (md *JWTMiddleware) Middleware(c *gin.Context) {
-	session, err := md.findSession(c)
-	if err != nil {
-		c.Set(GIN_JWT_SESSION_KEY, session)
-	}
+	session, _ := md.findSession(c)
+	c.Set(GIN_JWT_SESSION_KEY, session)
 	c.Next()
 }
