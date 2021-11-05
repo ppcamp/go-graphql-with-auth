@@ -2,7 +2,7 @@ package user
 
 import (
 	"github.com/jmoiron/sqlx"
-	"github.com/ppcamp/go-graphql-with-auth/internal/models/usermodels"
+	usermodels "github.com/ppcamp/go-graphql-with-auth/internal/models/user"
 	"github.com/ppcamp/go-graphql-with-auth/internal/utils"
 )
 
@@ -42,5 +42,28 @@ func (t *UserTransaction) FindUsers(filter *usermodels.UserQueryPayload) (users 
 	`
 	stmt := utils.Must(t.tx.PrepareNamed(sql)).(*sqlx.NamedStmt)
 	err = stmt.Select(&users, filter)
+	return
+}
+
+func (t *UserTransaction) EditUser(payload *usermodels.UserMutationPayload) (user usermodels.UserEntity, err error) {
+	user = usermodels.UserEntity{}
+	user.Email = payload.Password
+	user.Nick = payload.Nick
+	user.Id = payload.Id
+	user.Password = payload.Password
+
+	sql := `
+	UPDATE users
+	SET password = COALESCE(:password, password),
+			email = COALESCE(:email, email),
+			nick = COALESCE(:nick, nick)
+	WHERE id = :id
+	RETURNING updated_at
+	`
+	rows, err := t.tx.NamedQuery(sql, payload)
+	if rows.Next() {
+		err = rows.Scan(&user.UpdatedAt)
+	}
+
 	return
 }

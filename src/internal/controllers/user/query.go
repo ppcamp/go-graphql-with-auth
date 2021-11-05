@@ -2,7 +2,7 @@ package user
 
 import (
 	"github.com/ppcamp/go-graphql-with-auth/internal/helpers/controller"
-	"github.com/ppcamp/go-graphql-with-auth/internal/models/usermodels"
+	usermodels "github.com/ppcamp/go-graphql-with-auth/internal/models/user"
 )
 
 type QueryUserController struct {

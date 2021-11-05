@@ -5,11 +5,11 @@ import (
 	usermodels "github.com/ppcamp/go-graphql-with-auth/internal/models/user"
 )
 
-type CreateUserController struct {
+type EditUserController struct {
 	controller.TransactionControllerImpl
 }
 
-func (c *CreateUserController) Execute(pl interface{}) (result controller.ResponseController) {
+func (c *EditUserController) Execute(pl interface{}) (result controller.ResponseController) {
 	user := pl.(*usermodels.UserMutationPayload)
 	result = controller.NewResponseController()
 
@@ -20,6 +20,6 @@ func (c *CreateUserController) Execute(pl interface{}) (result controller.Respon
 	return
 }
 
-func NewCreateUserController() controller.TransactionController {
-	return &CreateUserController{}
+func NewEditUserController() controller.TransactionController {
+	return &EditUserController{}
 }

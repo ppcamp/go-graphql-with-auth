@@ -2,56 +2,30 @@ package jwt
 
 import (
 	"context"
+	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	jwt "github.com/golang-jwt/jwt"
 )
 
-// Is the name of the key for the gin. Using this key we can get the value later
-// on the gin context
-const GIN_JWT_SESSION_KEY = "jwt_session"
-
 // BlankSession is the default value returned when occurrs a problem to login
 var BLANK_SESSION = Session{}
 
 type LoginSession struct {
-	PhoneNumber string `json:"phone_number,omitempty"`
+	UserId string `json:"userId,omitempty"`
 }
 
 type Session struct {
-	LoginSession // fields to put into jwt key
+	*LoginSession // fields to put into jwt key
 
 	Authenticated bool `json:"-"` // doesn't have any value
-}
-
-type UserSession struct {
-	PhoneNumber string `json:"phone_number,omitempty"`
 }
 
 // jwtClaims is used by jwt middleware
 type jwtClaims struct {
 	Session
 	jwt.StandardClaims
-}
-
-// GetSession get the current session of the gin.
-// If there's no session in the req, returns false
-func GetSession(c context.Context) (Session, bool) {
-	if c, ok := c.(*gin.Context); ok {
-		session, ok := c.Get(GIN_JWT_SESSION_KEY)
-
-		if !ok {
-			return Session{}, false
-		}
-
-		ses := session.(Session)
-		ses.Authenticated = true
-
-		return ses, true
-	}
-
-	return Session{}, false
 }
 
 // generateJwt generates a token to the current session for a given amount
@@ -74,4 +48,46 @@ func generateJwtAsSignedString(session Session, expiration time.Time, key []byte
 	token := generateJwt(session, expiration)
 	signedString, err := token.SignedString(key)
 	return signedString, err
+}
+
+// Token login response
+type tokenResponse struct {
+	Token   string `json:"token,omitempty"`   // Session token
+	Expires string `json:"expires,omitempty"` // Expiration timestamp
+}
+
+// buildAndResponseToken generates a signed endpoint with expiration
+func (md *JWTMiddleware) buildAndResponseToken(c *gin.Context, session Session, domain string) {
+	exp := time.Now().UTC().Add(md.Expires)
+	signedString, err := generateJwtAsSignedString(session, exp, md.Key)
+
+	if err != nil {
+		// c.Error(err)
+		// c.AbortWithStatus(http.StatusUnauthorized)
+		c.AbortWithStatusJSON(http.StatusUnauthorized, err)
+		return
+	}
+
+	c.SetCookie("session", signedString, int(md.Expires.Seconds()), "/", domain, false, false)
+
+	c.JSON(http.StatusOK, tokenResponse{
+		Token:   signedString,
+		Expires: exp.Format(time.RFC3339),
+	})
+}
+
+// GetSession get the current session registered into context.
+func GetSession(c context.Context) (Session, error) {
+	session := c.Value(GIN_JWT_SESSION_KEY)
+
+	if ses, ok := session.(Session); ok {
+		if ses.LoginSession == nil {
+			return Session{}, ErrMissingAuthorization
+		}
+		ses.Authenticated = true
+		return ses, nil
+	} else {
+		// logrus.WithField("cox", session).Debug(strings.Repeat("x", 50))
+		return Session{}, ErrMissingAuthorization
+	}
 }

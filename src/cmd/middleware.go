@@ -15,8 +15,7 @@ var (
 	ErrMethodNotAllowed   = errors.New("method not allowed")
 )
 
-type Middleware struct {
-}
+type Middleware struct{}
 
 func NewMiddleware() *Middleware {
 	return &Middleware{}
@@ -73,21 +72,5 @@ func (a *Middleware) MethodNotAllowed(c *gin.Context) {
 	c.Error(ErrMethodNotAllowed)
 	c.AbortWithStatus(http.StatusMethodNotAllowed)
 }
-
-//#endregion
-
-//#region: auth middleware
-
-// BuildAuthMiddleware builds a method that will be used to validate the
-// login configs. This method will use the auth service
-// func (a *Middleware) BuildAuthMiddleware() *jwt.JWTMiddleware {
-// 	authservice := auth.NewAuthService(a.Redis)
-
-// 	return &jwt.JWTMiddleware{
-// 		Key:              []byte(config.App.JWTSecret),
-// 		Expires:          config.JWT_EXPIRATION_TIME,
-// 		ApiAuthenticator: authservice.ApiAuthenticator,
-// 	}
-// }
 
 //#endregion

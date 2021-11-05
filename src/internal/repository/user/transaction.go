@@ -2,7 +2,7 @@ package user
 
 import (
 	"github.com/jmoiron/sqlx"
-	"github.com/ppcamp/go-graphql-with-auth/internal/models/usermodels"
+	usermodels "github.com/ppcamp/go-graphql-with-auth/internal/models/user"
 )
 
 type UserTransaction struct {
@@ -11,6 +11,7 @@ type UserTransaction struct {
 
 type UserStorage interface {
 	CreateUser(payload *usermodels.UserMutationPayload) (user usermodels.UserEntity, err error)
+	EditUser(payload *usermodels.UserMutationPayload) (user usermodels.UserEntity, err error)
 	FindUsers(filter *usermodels.UserQueryPayload) (users []usermodels.UserEntity, err error)
 }
 

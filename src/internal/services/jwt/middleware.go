@@ -1,192 +1,117 @@
 package jwt
 
-// import (
-// 	"net/http"
-// 	"strings"
-// 	"time"
+import (
+	"strings"
+	"time"
 
-// 	"github.com/eventials/vlab-baby-app-api/internal/config"
-// 	"github.com/eventials/vlab-baby-app-api/internal/helpers"
-// 	"github.com/eventials/vlab-baby-app-api/internal/helpers/validators"
-// 	loginmodels "github.com/eventials/vlab-baby-app-api/internal/models/login"
-// 	"github.com/gin-gonic/gin"
-// 	jwt "github.com/golang-jwt/jwt"
-// )
+	"github.com/gin-gonic/gin"
+	jwt "github.com/golang-jwt/jwt"
+)
 
-// type JWTMiddleware struct {
-// 	Expires          time.Duration
-// 	Key              []byte
-// 	ApiAuthenticator ApiAuthenticator
-// }
+// Is the name of the key for the gin. Using this key we can get the value later
+// on the gin context
+const GIN_JWT_SESSION_KEY = "jwt_session"
 
-// //#region: Generating JWT token
+type JWTMiddleware struct {
+	Expires time.Duration
+	Key     []byte
+}
 
-// // Token login response
-// type tokenResponse struct {
-// 	Token   string `json:"token,omitempty"`   // Session token
-// 	Expires string `json:"expires,omitempty"` // Expiration timestamp
-// }
+func NewJwtMiddleware(exp time.Duration, secret []byte) *JWTMiddleware {
+	return &JWTMiddleware{
+		Expires: exp,
+		Key:     secret,
+	}
+}
 
-// // buildAndResponseToken generates a signed endpoint with expiration
-// func (md *JWTMiddleware) buildAndResponseToken(c *gin.Context, session Session, domain string) {
-// 	exp := time.Now().UTC().Add(md.Expires)
-// 	signedString, err := generateJwtAsSignedString(session, exp, md.Key)
+//#region: Extracting and validating it
 
-// 	if err != nil {
-// 		// c.Error(err)
-// 		// c.AbortWithStatus(http.StatusUnauthorized)
-// 		c.AbortWithStatusJSON(http.StatusUnauthorized, helpers.JsonError{
-// 			Status: http.StatusUnauthorized,
-// 			Errors: []string{err.Error()},
-// 		})
-// 		return
-// 	}
+// getTokenFromHeader extracts the JWT token from the request headers.
+//
+// If everything occurrs well, returns the extracted jwt, otherwise, throw an
+// error.
+func (md *JWTMiddleware) getTokenFromHeader(c *gin.Context) (string, error) {
+	authHeader := c.Request.Header.Get("Authorization")
 
-// 	c.SetCookie("session", signedString, int(md.Expires.Seconds()), "/", domain, false, false)
+	if authHeader == "" {
+		return "", ErrMissingAuthorization
+	}
 
-// 	c.JSON(http.StatusOK, tokenResponse{
-// 		Token:   signedString,
-// 		Expires: exp.Format(time.RFC3339),
-// 	})
-// }
+	bearerHeader := strings.SplitN(authHeader, " ", 2)
 
-// //#endregion
+	if bearerHeader[0] != "Bearer" {
+		return "", ErrInvalidBearerHeader
+	}
 
-// //#region: Extracting and validating it
+	return bearerHeader[1], nil
+}
 
-// // getTokenFromHeader extracts the JWT token from the request headers.
-// // If everything occurrs well, returns the extracted jwt, otherwise, throw an
-// // error.
-// func (md *JWTMiddleware) getTokenFromHeader(c *gin.Context) (string, error) {
-// 	authHeader := c.Request.Header.Get("Authorization")
+// getTokenFromCookie extracts the JWT token from the request cookies.
+//
+// If everything occurrs well, returns the extracted jwt, otherwise, throw an
+// error.
+func (md *JWTMiddleware) getTokenFromCookie(c *gin.Context) (string, error) {
+	return c.Cookie("session")
+}
 
-// 	if authHeader == "" {
-// 		return "", ErrMissingAuthorization
-// 	}
+// getJWTClaims extract the JWT clains object
+func (md *JWTMiddleware) getJWTClaims(tokenString string) (*jwtClaims, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &jwtClaims{},
+		func(token *jwt.Token) (interface{}, error) {
+			return md.Key, nil
+		})
 
-// 	bearerHeader := strings.SplitN(authHeader, " ", 2)
+	if err != nil || !token.Valid {
+		return nil, ErrInvalidJWTToken
+	}
 
-// 	if bearerHeader[0] != "Bearer" {
-// 		return "", ErrInvalidBearerHeader
-// 	}
+	claims, ok := token.Claims.(*jwtClaims)
 
-// 	return bearerHeader[1], nil
-// }
+	if !ok {
+		return nil, ErrInvalidJWTClaims
+	}
 
-// // getTokenFromCookie extracts the JWT token from the request cookies.
-// // If everything occurrs well, returns the extracted jwt, otherwise, throw an
-// // error.
-// func (md *JWTMiddleware) getTokenFromCookie(c *gin.Context) (string, error) {
-// 	return c.Cookie("session")
-// }
+	return claims, nil
+}
 
-// // getJWTClaims extract the JWT clains object
-// func (md *JWTMiddleware) getJWTClaims(tokenString string) (*jwtClaims, error) {
-// 	token, err := jwt.ParseWithClaims(tokenString, &jwtClaims{},
-// 		func(token *jwt.Token) (interface{}, error) {
-// 			return md.Key, nil
-// 		})
+// findSession get the current JWT session.
+//
+// This will search for token in the
+// request headers, if didn't find it, it'll use the cookies instead.
+// If no token was provided, or if fails to get the session, will return a
+// blank cookie and an error message, otherwise, it'll returns the session and
+// nil.
+//
+// See [getTokenFromHeader], [getTokenFromCookie], [getJWTClaims]
+func (md *JWTMiddleware) findSession(c *gin.Context) (Session, error) {
+	tokeString, err := md.getTokenFromHeader(c)
 
-// 	if err != nil || !token.Valid {
-// 		return nil, ErrInvalidJWTToken
-// 	}
+	if err != nil {
+		tokeString, err = md.getTokenFromCookie(c)
 
-// 	claims, ok := token.Claims.(*jwtClaims)
+		if err != nil {
+			return BLANK_SESSION, err
+		}
+	}
 
-// 	if !ok {
-// 		return nil, ErrInvalidJWTClaims
-// 	}
+	claims, err := md.getJWTClaims(tokeString)
 
-// 	return claims, nil
-// }
+	if err != nil {
+		return BLANK_SESSION, err
+	}
 
-// // findSession get the current JWT session. This will search for token in the
-// // request headers, if didn't find it, it'll use the cookies instead.
-// // If no token was provided, or if fails to get the session, will return a
-// // blank cookie and an error message, otherwise, it'll returns the session and
-// // nil.
-// //
-// // See [getTokenFromHeader], [getTokenFromCookie], [getJWTClaims]
-// func (md *JWTMiddleware) findSession(c *gin.Context) (Session, error) {
-// 	tokeString, err := md.getTokenFromHeader(c)
+	return claims.Session, nil
+}
 
-// 	if err != nil {
-// 		tokeString, err = md.getTokenFromCookie(c)
+//#endregion
 
-// 		if err != nil {
-// 			return BLANK_SESSION, err
-// 		}
-// 	}
-
-// 	claims, err := md.getJWTClaims(tokeString)
-
-// 	if err != nil {
-// 		return BLANK_SESSION, err
-// 	}
-
-// 	return claims.Session, nil
-// }
-
-// //#endregion
-
-// // Middleware is the function passed through gin setup
-// func (md *JWTMiddleware) Middleware(c *gin.Context) {
-// 	session, err := md.findSession(c)
-
-// 	if err != nil {
-// 		// c.Error(err)
-// 		// c.AbortWithStatus(http.StatusUnauthorized)
-// 		c.AbortWithStatusJSON(http.StatusUnauthorized, helpers.JsonError{
-// 			Status: http.StatusUnauthorized,
-// 			Errors: []string{err.Error()},
-// 		})
-// 		return
-// 	}
-
-// 	c.Set(GIN_JWT_SESSION_KEY, session)
-// 	c.Next()
-// }
-
-// // RefreshHandler get the current session and generates a new jwt token.
-// // Note that this function doesn't care about unvalidate the old one.
-// func (md *JWTMiddleware) RefreshHandler(c *gin.Context) {
-// 	session, ok := GetSession(c)
-
-// 	if !ok {
-// 		c.AbortWithStatus(http.StatusUnauthorized)
-// 		return
-// 	}
-
-// 	md.buildAndResponseToken(c, session, config.App.ApiDomain)
-// }
-
-// // LoginHandler will validate the login and, if the login is a valid one,
-// // returns a jwt signed token.
-// // See auth.ApiAuthenticator
-// func (md *JWTMiddleware) LoginHandler(c *gin.Context) {
-// 	login := &loginmodels.LoginPayload{}
-
-// 	err := c.ShouldBindJSON(&login)
-// 	if err != nil {
-// 		// c.Error(ErrInvalidLoginPayload)
-// 		// c.AbortWithStatus(http.StatusBadRequest)
-// 		c.AbortWithStatusJSON(http.StatusBadRequest, helpers.JsonError{
-// 			Status: http.StatusBadRequest,
-// 			Errors: validators.MapErrorsToMessages(err),
-// 		})
-// 		return
-// 	}
-
-// 	session, err := md.ApiAuthenticator(login)
-// 	if err != nil {
-// 		// c.Error(err)
-// 		// c.AbortWithStatus(http.StatusUnauthorized)
-// 		c.AbortWithStatusJSON(http.StatusUnauthorized, helpers.JsonError{
-// 			Status: http.StatusUnauthorized,
-// 			Errors: []string{ErrInvalidLoginPayload.Error()},
-// 		})
-// 		return
-// 	}
-
-// 	md.buildAndResponseToken(c, session, config.App.ApiDomain)
-// }
+// Middleware is the function passed through gin setup.
+//
+// This function will register the header auth into context
+func (md *JWTMiddleware) Middleware(c *gin.Context) {
+	session, err := md.findSession(c)
+	if err != nil {
+		c.Set(GIN_JWT_SESSION_KEY, session)
+	}
+	c.Next()
+}

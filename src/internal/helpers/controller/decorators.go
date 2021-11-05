@@ -6,6 +6,7 @@ import (
 	"github.com/graphql-go/graphql"
 	"github.com/ppcamp/go-graphql-with-auth/internal/helpers/validators"
 	"github.com/ppcamp/go-graphql-with-auth/internal/services/jwt"
+	"github.com/sirupsen/logrus"
 )
 
 // Request will check the type of the baseController object
@@ -26,12 +27,20 @@ func (h *Handler) Request(
 	session, _ := jwt.GetSession(p.Context)
 	ctrl.SetSession(session)
 
+	var result interface{}
+	var err error
+
 	switch ctrl := ctrl.(type) {
 	case TransactionController:
-		return h.transactionController(payload, ctrl)
+		result, err = h.transactionController(payload, ctrl)
 	default:
-		return h.baseController(payload, ctrl)
+		result, err = h.baseController(payload, ctrl)
 	}
+
+	if err != nil {
+		logrus.WithError(err).Error("some error occurred in this call")
+	}
+	return result, err
 }
 
 // baseController is a simple controller. It doesn't implement the database and

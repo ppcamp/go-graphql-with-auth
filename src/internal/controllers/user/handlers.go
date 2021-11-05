@@ -2,7 +2,7 @@ package user
 
 import (
 	"github.com/graphql-go/graphql"
-	"github.com/ppcamp/go-graphql-with-auth/internal/models/usermodels"
+	usermodels "github.com/ppcamp/go-graphql-with-auth/internal/models/user"
 )
 
 // [QUERY] user
@@ -55,6 +55,34 @@ func (t *UserControllerBuilder) CreateUser() *graphql.Field {
 
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 			return t.handler.Request(p, &usermodels.UserMutationPayload{}, NewCreateUserController())
+		},
+	}
+}
+
+// [MUTATION] editUser
+func (t *UserControllerBuilder) EditUser() *graphql.Field {
+	return &graphql.Field{
+		Type:        userType,
+		Description: "Edit an user basing on its id",
+
+		Args: graphql.FieldConfigArgument{
+			"id": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.Int),
+			},
+
+			"nick": &graphql.ArgumentConfig{
+				Type: graphql.String,
+			},
+			"password": &graphql.ArgumentConfig{
+				Type: graphql.String,
+			},
+			"email": &graphql.ArgumentConfig{
+				Type: graphql.String,
+			},
+		},
+
+		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+			return t.handler.Request(p, &usermodels.UserMutationPayload{}, NewEditUserController())
 		},
 	}
 }
