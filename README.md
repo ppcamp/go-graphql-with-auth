@@ -4,6 +4,9 @@
 This repository will contain a simple (and yet maintanable) project structure
 for using in a graphql server.
 
+This repository also have a full tutorial in my portfolio. Take a look at 
+https://ppcamp.github.io/post/graphql-go/
+
 
 ## How to run
 go
